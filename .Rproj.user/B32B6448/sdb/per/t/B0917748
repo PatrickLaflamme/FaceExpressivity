@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "data <- data2[!(data2$Subject %in% c(11, 42, 77, 43)),] #43 removed for >95% same response, others for notes in binder\n\ndata<- data[-7813,]\n\ndata$RT <- as.numeric(data$RT)\ndata$Response <- as.numeric(data$Response)\ndata$Answer <- as.numeric(data$Answer)\n\ndata <- data[data$RT<mean(data$RT)+5*sd(data$RT),]\n\ndata <- data[data$Experiment.Stage==1,]\n\nk <- 0\nfor(i in unique(data$Subject)){\n  test <- sum(data$Response[data$Subject==i])/length(data$Response[data$Subject==i])\n  \n  if(test<0.05 | test>0.95){\n    k <- k+1\n    print(i)\n    }\n  \n}\nprint(k)\n\n\nfor(i in unique(dprimeMEAN$subject)){\n  \n  dprimeMEAN$dprime[dprimeMEAN$subject==i] <- dprimeMEAN$dprime[dprimeMEAN$subject==i] - mean(dprimeMEAN$dprime[dprimeMEAN$subject==i])\n  \n}\n\ndprimeMEANs <- aggregate(dprime~emotion, data=dprimeMEAN, FUN = mean)\ndprimeSDs <- aggregate(dprime~emotion, data=dprimeMEAN, FUN = sd)\ndprimeMEANS <- cbind(dprimeMEANs, dprimeSDs[,2])\n",
+    "created" : 1484865173579.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3201668737",
+    "id" : "B0917748",
+    "lastKnownWriteTime" : 1486076631,
+    "last_content_update" : 1486076631974,
+    "path" : "~/Dropbox/WSEFEP_HQ_042016/Data Analysis/FaceExpressivity/DataCleaningRecord.R",
+    "project_path" : "DataCleaningRecord.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

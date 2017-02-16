@@ -1,0 +1,69 @@
+---
+title: "Face Expressivity Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r Analysis}
+#####
+#Actually use these functions
+
+#import the data we need
+
+#data <- import_expressivity_data('~/Dropbox/Apps/Emotion_Sensitivity/Experiment_1/','[0-9]_ES.csv')
+
+#data <- add_img_data('WSEFEP-norms&FACS.csv', data)
+
+data$FaceByEmotion <- with(data, interaction(FaceIdentity, Emotion), drop=T)
+
+dprime <- calc_dprime(data, "Emotion", "noise", "FaceIdentity")
+
+#now let's aggregate for inspection
+dprimeMEAN <- ddply(dprime, .(Emotion, FaceIdentity), summarize, dprime = mean(dprime))
+
+
+total.model <- aov(dprime ~ Emotion*FaceIdentity + Error(Subject/Emotion*FaceIdentity), data = dprime)
+summary(total.model)
+
+partAverage <- ddply(dprime, .(Subject), summarize, dprime = mean(dprime))
+# 
+# dprime$dprimeAdjusted <- NA
+# 
+# for(i in unique(dprime$subject)){
+#   
+#   dprime$dprimeAdjusted[dprime$subject==i] <- dprime$dprime[dprime$subject==i] - partAverage$x[partAverage$Group.1==i]
+#   
+# }
+
+
+participant <- calc_dprime(data, "FaceByEmotion", "no.noise")
+
+
+# dprime$intensity <- NA
+# 
+# for(i in 1:nrow(dprime)){
+#   
+#   dprime$intensity[i] <- info_base$Intensity..0.1.[as.character(dprime$ID)[i]==info_base$Displayer.ID & dprime$emotion[i]==info_base$Display]
+#   
+# }
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

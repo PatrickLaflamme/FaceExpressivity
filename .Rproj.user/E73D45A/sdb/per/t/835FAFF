@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Face Expressivity Analysis\"\noutput: html_document\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\n## R Markdown\n\nThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.\n\nWhen you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:\n\n```{r Analysis}\n#####\n#Actually use these functions\n\n#import the data we need\n\n#data <- import_expressivity_data('~/Dropbox/Apps/Emotion_Sensitivity/Experiment_1/','[0-9]_ES.csv')\n\n#data <- add_img_data('WSEFEP-norms&FACS.csv', data)\n\ndata$FaceByEmotion <- with(data, interaction(FaceIdentity, Emotion), drop=T)\n\ndprime <- calc_dprime(data, \"Emotion\", \"noise\", \"FaceIdentity\")\n\n#now let's aggregate for inspection\ndprimeMEAN <- ddply(dprime, .(Emotion, FaceIdentity), summarize, dprime = mean(dprime))\n\n\ntotal.model <- aov(dprime ~ Emotion*FaceIdentity + Error(Subject/Emotion*FaceIdentity), data = dprime)\nsummary(total.model)\n\npartAverage <- ddply(dprime, .(Subject), summarize, dprime = mean(dprime))\n# \n# dprime$dprimeAdjusted <- NA\n# \n# for(i in unique(dprime$subject)){\n#   \n#   dprime$dprimeAdjusted[dprime$subject==i] <- dprime$dprime[dprime$subject==i] - partAverage$x[partAverage$Group.1==i]\n#   \n# }\n\n\nparticipant <- calc_dprime(data, \"FaceByEmotion\", \"no.noise\")\n\n\n# dprime$intensity <- NA\n# \n# for(i in 1:nrow(dprime)){\n#   \n#   dprime$intensity[i] <- info_base$Intensity..0.1.[as.character(dprime$ID)[i]==info_base$Displayer.ID & dprime$emotion[i]==info_base$Display]\n#   \n# }\n\n```\n\n## Including Plots\n\nYou can also embed plots, for example:\n\n```{r pressure, echo=FALSE}\nplot(pressure)\n```\n\nNote that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.\n",
+    "created" : 1483984983186.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1136512734",
+    "id" : "835FAFF",
+    "lastKnownWriteTime" : 1483989802,
+    "last_content_update" : 1483989802418,
+    "path" : "~/Dropbox/WSEFEP_HQ_042016/Data Analysis/FaceExpressivity/Face Expressivity Analysis Summary.Rmd",
+    "project_path" : "Face Expressivity Analysis Summary.Rmd",
+    "properties" : {
+        "last_setup_crc32" : "",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

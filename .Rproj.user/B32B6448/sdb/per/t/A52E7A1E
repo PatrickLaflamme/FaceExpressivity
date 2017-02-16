@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#####\n#Actually use these functions\n\n#import the data we need\n\n#data <- import_expressivity_data('~/Dropbox/Apps/Emotion_Sensitivity/Experiment_1/','[0-9]_ES.csv')\n\n#data <- add_img_data('WSEFEP-norms&FACS.csv', data)\n\ndata$FaceByEmotion <- with(data, interaction(FaceIdentity, Emotion), drop=T)\n\ndprime <- calc_dprime(data, \"Emotion\", \"noise\")\n\n#now let's aggregate for inspection\ndprimeMEAN <- ddply(dprime, .(Emotion), summarize, dprime = mean(dprime))\n\n\ntotal.model <- aov(dprime ~ Emotion + Error(Subject/Emotion), data = dprime)\nsummary(total.model)\n\npartAverage <- ddply(dprime, .(Subject), summarize, dprime = mean(dprime))\n# \n# dprime$dprimeAdjusted <- NA\n# \n# for(i in unique(dprime$subject)){\n#   \n#   dprime$dprimeAdjusted[dprime$subject==i] <- dprime$dprime[dprime$subject==i] - partAverage$x[partAverage$Group.1==i]\n#   \n# }\n\n\nparticipant <- calc_dprime(data, \"FaceByEmotion\", \"no.noise\")\n\n\n# dprime$intensity <- NA\n# \n# for(i in 1:nrow(dprime)){\n#   \n#   dprime$intensity[i] <- info_base$Intensity..0.1.[as.character(dprime$ID)[i]==info_base$Displayer.ID & dprime$emotion[i]==info_base$Display]\n#   \n# }\n\npar(mfrow=c(3,4))\nfor(i in keepers$Displayer.ID){\n     data <- filter(info_base, Displayer.ID == i)\n     data <- filter(data, Display != \"neutral\")\n     plot(sort(data$`Intensity..0.1.`), main = i)\n  }\n\n",
+    "created" : 1484269155776.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "880609395",
+    "id" : "A52E7A1E",
+    "lastKnownWriteTime" : 1484269967,
+    "last_content_update" : 1484269967966,
+    "path" : "~/Dropbox/WSEFEP_HQ_042016/Data Analysis/FaceExpressivity/Run_Analysis.R",
+    "project_path" : "Run_Analysis.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

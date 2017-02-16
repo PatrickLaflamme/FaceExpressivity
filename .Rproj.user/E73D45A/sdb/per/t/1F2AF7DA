@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#######\n#import data\n#######\n\nimport_expressivity_data <- function(directory, filepattern){\n  ##\n  ##  directory     ::  location of the data files\n  ##\n  ##  filepattern   ::  Pattern to accept as datafiles. Uses regex\n  ##\n  ##  loads all the data files in a directory and saves them as a single dataframe\n\n  names <- list.files(path = directory, pattern = filepattern, full.names = T)\n  \n  output <- data.frame()\n  \n  for(i in names){\n    \n    newdata <- read.csv(i, header=TRUE, row.names=NULL)\n    \n    output <- rbind(output, newdata)\n    \n  }\n  \n  return(output)\n}\n\nadd_img_data <- function(image_db_name, data){\n  \n  #load the image data\n  image_data <- read.csv(image_db_name, row.names = NULL)\n  \n  #make some corrections for how CSVs are read into R.\n  data$Target_name <- strsplit(as.character(data$Target_name),'.png')\n  image_data$Picture.ID <- strsplit(as.character(image_data$Picture.ID), '.jpg')\n  image_data$Display <- as.character(image_data$Display)\n  image_data$Male..Female <- as.character(image_data$Male..Female)\n  image_data$Intensity..0.1.[image_data$Intensity..0.1.=='x'] <- NA\n  image_data$Intensity..0.1. <- as.double(image_data$Intensity..0.1.)\n  \n  \n  #create the new storage variable for the extra data\n  extradata <- data.frame(matrix(ncol=3, nrow = nrow(data)))\n  colnames(extradata) <- c('img_sex','Emotion', 'intensity')\n  \n  data$FaceIdentity <- NA\n  \n  pb <- progress::progress_bar$new(total = nrow(data))\n  #for each image in the dataframe, do this\n  for(i in 1:nrow(data)){\n    \n    data$FaceIdentity[i]<- strsplit(data$Target_name[i][[1]],\"_\")[[1]][1]\n    \n    if(length(grep(data$Target_name[i], image_data$Picture.ID))>0){\n      extradata[i,] <- image_data[grep(data$Target_name[i], image_data$Picture.ID),c(3,4,7)]\n    }\n    else{\n      if(data$Target_name[i]=='no_img'){\n        extradata[i,] <-c(NA, 'noise', NA)\n      }\n      else{\n        extradata[i,] <- c(NA, NA, NA)\n        print(paste(\"caution: row\",i,'has a filename that is not recognized'))\n      }\n    }\n    pb$tick()\n  }\n  \n  data <- cbind(data, extradata)\n  \n  return(data)\n\n}\n\ncalc_dprime <- function(data, by, noiseval,Grouping=NULL){\n  \n  grouping <- c(\"Subject\", Grouping)\n  \n  pFAs <- ddply(data[data[,by]==noiseval,], grouping , summarize, pFAs=mean(Response))\n  \n  pFAs <- rep(pFAs$pFAs, each=7*30)\n  \n  pHIT <- ddply(data[data[,by]!=noiseval,], c(grouping,by), summarize, pHIT=mean(Response))\n  \n  output <- cbind(pHIT, pFAs)\n  \n  output$pHIT <- mapvalues(output$pHIT, c(0, 1), c(1/4, 3/4))\n  \n  output <- mutate(output, dprime = qnorm(pHIT) - qnorm(pFAs))\n  \n  return(output)\n}\n\nconvert_FACS_to_dim <- function(info_base){\n  \n  intensity <- list(A = 0.1, B = 0.3, C = 0.525, D = 0.775, E = .9)\n  #intensity <- list(A = 1, B = 1, C = 1, D = 1, E = 1)\n  FACS <- strsplit(info_base$FACS, split = \"+\", fixed = T)\n  \n  dimensions = matrix(data = 0, nrow = nrow(info_base), ncol = 70)\n  \n  for(i in 1:nrow(info_base)){\n    intensities <- as.matrix(intensity[gsub(\"L\",\"\",gsub(\"[[:digit:]]\",\"\", FACS[[i]]))])\n    groups <- as.numeric(gsub(\"[^[:digit:]]\",\"\", FACS[[i]]))\n    for(j in 1:length(groups)){\n      if(!is.null(intensities[[j]])){\n        dimensions[i,groups[j]+1] <- intensities[[j]]\n      }\n    }\n  }\n  \n  return(dimensions)\n}\n\ncart2pol <- Vectorize(function(x, y){\n  r <- sqrt(x^2 + y^2)\n  t <- atan(y/x)\n  \n  c(r,t)\n}, vectorize.args = c('x','y'))\n",
+    "created" : 1483984400696.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "4|61|25|0|\n27|46|72|0|\n93|43|112|0|\n",
+    "hash" : "2798688706",
+    "id" : "1F2AF7DA",
+    "lastKnownWriteTime" : 1483986753,
+    "last_content_update" : 1483991727832,
+    "path" : "~/Dropbox/WSEFEP_HQ_042016/Data Analysis/FaceExpressivity/Useful Functions.R",
+    "project_path" : "Useful Functions.R",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
